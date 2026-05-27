@@ -3,10 +3,10 @@ package object_class_first_project;
 public class Department {
     private String name;
     private int numOfStudents;
-    private int numOflecturers=0;
-    private Lecturers[] lecturers = new Lecturers[10];
+    private int numOfLecturers=0;
+    private Lecturer[] lecturers = new Lecturer[10];
 
-    public Department (int numOfStudents , String  name, Lecturers firstFecturer) {
+    public Department (int numOfStudents , String  name, Lecturer firstFecturer) {
         this(numOfStudents, name);
         addLecturer(firstFecturer);
     }
@@ -24,43 +24,43 @@ public class Department {
         return numOfStudents;
     }
 
-    public Lecturers[] getLecturers() {
+    public Lecturer[] getLecturers() {
         return lecturers;
     }
 
-    public boolean addLecturer(Lecturers theLecturer){
+    public boolean addLecturer(Lecturer theLecturer){
         if(theLecturer == null){
             return false;
         }
 
-        if(numOflecturers >= lecturers.length){
-            Lecturers[] oldLecturers = lecturers;
-            lecturers =  new Lecturers[numOflecturers*2];
-            for(int i=0;i<oldLecturers.length;i++){
-                lecturers[i] = oldLecturers[i];
-            }
+        if(numOfLecturers >= lecturers.length){
+            Tools.doubleLecturers(lecturers, numOfLecturers);
         }
 
-        lecturers[numOflecturers] = theLecturer;
+        lecturers[numOfLecturers] = theLecturer;
         theLecturer.setDepartment(this);
-        numOflecturers++;
+        numOfLecturers++;
 
         return true;
     }
 
-    public boolean removeLecturer(Lecturers theLecturer){
-        for(int i=0;i<numOflecturers;i++){
+    public boolean removeLecturer(Lecturer theLecturer){
+        for(int i=0;i<numOfLecturers;i++){
             if(theLecturer==lecturers[i]){
                 theLecturer.setDepartment(null);
-                for(int j=i+1;j<numOflecturers;j++){
+                for(int j=i+1;j<numOfLecturers;j++){
                     lecturers[j-1]=lecturers[j];
                 }
-                lecturers[numOflecturers-1]=null;
-                numOflecturers--;
+                lecturers[numOfLecturers-1]=null;
+                numOfLecturers--;
                 return true;
             }
         }
         return false;
+    }
+
+    public int getWageAve(){
+        return Tools.getWageAve(lecturers , numOfLecturers);
     }
 
 

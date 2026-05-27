@@ -3,198 +3,253 @@ import java.util.Scanner;
 
 public class Main {
 
-    public static String[] ExtendedArray(String [] arr){
-        String[] temp = new String[arr.length * 2];
-        for (int i=0; i<arr.length; i++){
-            temp[i] = arr[i];
-        }
-        return temp;
-    }
-
-    public static boolean FindNameInArray(String name, String[] arr){
-        for (int i=0; i<arr.length; i++){
-            if (arr[i] != null && arr[i].equals(name)){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static String[] addNewItemToArray(String newitem, String[]list){
-        if(FindNameInArray(newitem,list)){
-            System.out.println("Item already in the list!");
-            return list;
-        }
-        for(int i = 0 ; i < list.length; i++){
-            if (list[i]==null){
-                list[i]=newitem;
-                System.out.println("Item added successfully!");
-                return list;
-            }
-        }
-
-        list = ExtendedArray(list);
-        list[list.length/2]=newitem;
-
-        System.out.println("Item added successfully! (after extending the array)");
-        return list;
-    }
-
-
-     public static void ShowItemsInArray(String[] arr){
-        for (String item : arr) {
-            if (item != null) {
-            System.out.println(item);
-            }
-        }
-    }
-
     public static void main(String[] args){
         // Sagi Gilad - 324020825
         // Or Haklay - 322307687
         Scanner s = new Scanner((System.in));
 
-        String[] Lecturers = new String[2];
-        String[] Committees = new String[2];
-        String[] Departments = new String[2];
-
-
         //start
         System.out.println("Enter Collage name: ");
-        String Collage = s.next();
+        String collageName = s.next();
+        Collage c = new Collage(collageName);
         boolean isRun = true;
 
         while (isRun){
             System.out.println("------------");
-            System.out.println("Welcome to " + Collage);
+            System.out.println("Welcome to " + c.getCollageName());
             System.out.println("This is the menu to your collage admin system");
-            System.out.println("choose one of the next opptions (0-8):");
+            System.out.println("choose one of the next opptions (0-11):");
             System.out.println("------------");
             System.out.println("0 - Exit");
-            System.out.println("1 - Add Lecturer ");
-            System.out.println("2 - Add Committee");
-            System.out.println("3 - Add Department");
-            System.out.println("4 - Add Lecturer to Committee");
-            System.out.println("5 - Show average of Lecturers  wage");
-            System.out.println("6 - Show average of Lecturers  wage of specific Department");
-            System.out.println("7 - Show Lucturers info");
-            System.out.println("8 - Show Departmens info");
-
+            System.out.println("1 - Add Lecturer To Collage ");
+            System.out.println("2 - Add Committee To Collage");
+            System.out.println("3 - Add Lecturer to Committee");
+            System.out.println("4 - Update CEO to Committee");
+            System.out.println("5 - Remove Lecturer From Committee");
+            System.out.println("6 - Add Department To Collage");
+            System.out.println("7 - Add Lecturer to Department");
+            System.out.println("8 - Show average of Lecturers  wage");
+            System.out.println("9 - Show average of Lecturers  wage of specific Committee");
+            System.out.println("10 - Show Lucturers info");
+            System.out.println("11 - Show Committees info");
             System.out.println("------------");
             System.out.println("Enter your choose: ");
 
             int userChoose = s.nextInt();
 
             if (userChoose == 0 ){
-            System.out.println("Good bye!!");
-                isRun = false;
+                System.out.println("goodbye");
+                break;
             }
             else if (userChoose == 1 ){
-                System.out.println("1 - Add Lecturer");
-                boolean validName = false;
-                String LecturerName="";
+                System.out.println("enter lecturer name: ");
                 s.nextLine();
-                while(!validName){
-                    System.out.println("Enter Lecturer name: ");
-                    LecturerName = s.nextLine();
-                    if( FindNameInArray(LecturerName, Lecturers)){
-                        System.out.println("Name already in the list! Please enter a different name.");
-                    } else {
-                        validName = true;
+                String lecturerName = s.nextLine();
+                Lecturer.eDegree selectedDegree = null;
+                while (selectedDegree == null) {
+                    System.out.println("choose lecturer degree from list (first_degree, masters, phd):");
+                    String input = s.next();
+                    if (input.equals("first_degree") || input.equals("masters") || input.equals("phd") ){
+                        selectedDegree = Lecturer.eDegree.valueOf(input);
+
+                    }
+                    else{
+                        System.out.println("invalid input!");
                     }
                 }
 
-                Lecturers = addNewItemToArray(LecturerName, Lecturers);
-                ShowItemsInArray(Lecturers);
+                System.out.println("Enter Salary: ");
+                int salary = s.nextInt();
+
+                Lecturer l1 = new Lecturer(lecturerName, selectedDegree, salary);
+                c.addLecturer(l1);
+                System.out.println(l1.toString());
+
+
             }
-            else if (userChoose == 2 ){
-                System.out.println("2 - Add Committee");
-                boolean validName2 = false;
-                String CommitteeName = "";
-                s.nextLine();
-                while(!validName2){
-                    System.out.println("Enter Committee name: ");
-                    CommitteeName = s.nextLine();
-                    if(FindNameInArray(CommitteeName, Committees)){
-                        System.out.println("Name already in the list! Please enter a different name.");
+
+            else if (userChoose == 2 ) {
+
+                boolean validComm = false;
+                String CommitteesName;
+                s.nextLine(); // consume leftover newline from nextInt()
+                do {
+                    System.out.println("Enter committee name: ");
+                    CommitteesName = s.nextLine();
+                    if (!Tools.findCommitteeInArray(CommitteesName, c.getCommittees(), c.getNumOfCommittees())) {
+                        validComm = true;
                     } else {
-                        validName2 = true;
+                        System.out.println("commettiee is already exist!");
+
                     }
+
+                } while (!validComm);
+
+                ////ceo check
+                boolean validceo = false;
+                Lecturer l = null;
+                do {
+                    System.out.println("Enter ceo name: ");
+                    String ceoName = s.nextLine();
+                    if (Tools.findLecturInArray(ceoName, c.getLecturers(), c.getNumOfLecturers())) {
+                        l = Tools.getLecturer(ceoName, c.getLecturers());
+                        if (l.getDegree() == Lecturer.eDegree.phd) {
+                            validceo = true;
+                        } else {
+                            System.out.println("invalid lecturer degree! try again!");
+                        }
+                    } else {
+                        System.out.println("invalid lecture name! try again!");
+                    }
+
+                } while (!validceo);
+
+                Committee com = new Committee(CommitteesName, l);
+                if(c.addCommittee(com)){
+                    System.out.println("committee is added successfully!");
                 }
-                Committees = addNewItemToArray(CommitteeName, Committees);
-                ShowItemsInArray(Committees);
             }
+
             else if (userChoose == 3 ){
-                System.out.println("3 - Add Department");
-                boolean validName3 = false;
-                String DepartmentName = "";
-                s.nextLine();
-                while(!validName3){
-                    System.out.println("Enter Department name: ");
-                    DepartmentName = s.nextLine();
-                    if(FindNameInArray(DepartmentName, Departments)){
-                        System.out.println("Name already in the list! Please enter a different name.");
-                    } else {
-                        validName3 = true;
+                boolean validComm=false;
+                boolean validLecturer=false;
+                String committeeName;
+                String lucturerName;
+
+                s.nextLine(); // consume leftover newline from nextInt()
+                do {
+                    System.out.println("Enter committee name: ");
+                    committeeName = s.nextLine();
+                    if(Tools.findCommitteeInArray(committeeName,c.getCommittees(),c.getNumOfCommittees())){
+                        validComm=true;
                     }
+                    else{
+                        System.out.println("invalid committee name! try again!");
+                    }
+                }while(!validComm);
+
+                do {
+                    System.out.println("Enter lucturer name: ");
+                    lucturerName = s.nextLine();
+                    if(Tools.findLecturInArray(lucturerName,c.getLecturers(),c.getNumOfLecturers())){
+                        validLecturer=true;
+                    }
+                    else{
+                        System.out.println("invalid lucturer name! try again!");
+                    }
+                }while(!validLecturer);
+
+                if(Tools.getLecturer(lucturerName, c.getLecturers()) != null){
+                    c.addLecturerToCommittee(Tools.getLecturer(lucturerName, c.getLecturers()), Tools.getCommittee(committeeName, c.getCommittees()));
                 }
-                Departments = addNewItemToArray(DepartmentName, Departments);
-                ShowItemsInArray(Departments);
+
+
             }
             else if (userChoose == 4 ){
-                System.out.println("4 - Add Lecturer to Committee");
-                if (Lecturers[0] == null){
-                    System.out.println("No Lecturers in the list! Please add a Lecturer first.");
-                    continue;
-                }
-                if (Committees[0] == null){
-                    System.out.println("No Committees in the list! Please add a Committee first.");
-                    continue;
-                }
-                boolean validLecturer = false;
-                String LecturerNameToAdd = "";
-                s.nextLine();
-                while (!validLecturer) {
-                    System.out.println("This is the list of Lecturers in " + Collage + ":");
-                    ShowItemsInArray(Lecturers);
-                    System.out.println("Enter Lecturer name to add to Committee: ");
-                    LecturerNameToAdd = s.nextLine();
-                    if (!FindNameInArray(LecturerNameToAdd, Lecturers)) {
-                        System.out.println("Lecturer not found in the list! Please enter a valid Lecturer name.");
-                    } else {
-                        validLecturer = true;
+                boolean validComm=false;
+                boolean validLecturer=false;
+                String committeeName;
+                String lucturerName;
+
+                s.nextLine(); // consume leftover newline from nextInt()
+                do {
+                    System.out.println("Enter committee name: ");
+                    committeeName = s.nextLine();
+                    if(Tools.findCommitteeInArray(committeeName,c.getCommittees(),c.getNumOfCommittees())){
+                        validComm=true;
                     }
-                }
-                boolean validCommittee = false;
-                String CommitteeNameToAdd = "";
-                while (!validCommittee) {
-                    System.out.println("This is the list of Committees in " + Collage + ":");
-                    ShowItemsInArray(Committees);
-                    System.out.println("Enter Committee name to add Lecturer to: ");
-                    CommitteeNameToAdd = s.nextLine();
-                    if (!FindNameInArray(CommitteeNameToAdd, Committees)) {
-                        System.out.println("Committee not found in the list! Please enter a valid Committee name.");
-                    } else {
-                        validCommittee = true;
+                    else{
+                        System.out.println("invalid committee name! try again!");
                     }
+                }while(!validComm);
+
+                do {
+                    System.out.println("Enter lucturer name: ");
+                    lucturerName = s.nextLine();
+                    if(Tools.findLecturInArray(lucturerName,c.getLecturers(),c.getNumOfLecturers())){
+                        validLecturer=true;
+                    }
+                    else{
+                        System.out.println("invalid lucturer name! try again!");
+                    }
+                }while(!validLecturer);
+
+                boolean isDone = c.setCeo(Tools.getCommittee(committeeName, c.getCommittees()), Tools.getLecturer(lucturerName, c.getLecturers()));
+                if(isDone){
+                    System.out.println("committee is added successfully!");
+                }else {
+                    System.out.println("invalid committee name! try again!");
                 }
-                System.out.println("Lecturer " + LecturerNameToAdd + " added to Committee " + CommitteeNameToAdd + " successfully!");
+
             }
             else if (userChoose == 5 ){
-                System.out.println("5 Coming Soon...");
+                System.out.println("choose lecturer number");
+
+                System.out.println(Tools.showLecturerByIndex(c.getLecturers(),c.getNumOfLecturers()));
+                int LectureIndex = s.nextInt();
+                Lecturer toRemove= c.getLecturers()[LectureIndex];
+                System.out.println("choose the committee to remove lecturer from");
+                System.out.println(Tools.showCommiteesByIndex(toRemove.getCommittee(),toRemove.getNumOfCommittees()));
+                int commetiiChoose = s.nextInt();
+                Committee cTemp=toRemove.getCommittee()[commetiiChoose];
+
+                c.removeLecturerFromCommittee(toRemove, cTemp);
+
+
+
+
+
             }
             else if (userChoose == 6){
-                System.out.println("6 Coming Soon...");
+                s.nextLine();
+                System.out.print("Enter commit tee name: ");
+                String departmentName = s.nextLine();
+                System.out.println("Enter number of students: ");
+                int numOfStudents = s.nextInt();
+                Department d1 = new Department(numOfStudents,departmentName);
+                c.addDepartment(d1);
+                System.out.print("Name:" + d1.getName() + " | Number of students: " + d1.getNumOfStudents());
             }
             else if (userChoose == 7){
-                System.out.println("7 - Show Lecturers info");
-                System.out.println("This is the list of Lecturers in " + Collage + ":");
-                ShowItemsInArray(Lecturers);
+                System.out.println("choose lecturer number");
+                System.out.println(Tools.showLecturerByIndex(c.getLecturers(), c.getNumOfLecturers()));
+                int lecIndex = s.nextInt();
+                Lecturer lecToAdd = c.getLecturers()[lecIndex];
+
+                System.out.println("choose department number");
+                System.out.println(Tools.showDepartmentsByIndex(c.getDepartments(), c.getNumOfDepartments()));
+                int depIndex = s.nextInt();
+                Department depToAdd = c.getDepartments()[depIndex];
+
+                if (c.addLecturerToDepartment(depToAdd, lecToAdd)) {
+                    System.out.println("lecturer added to department successfully!");
+                } else {
+                    System.out.println("failed to add lecturer to department!");
+                }
             }
             else if (userChoose == 8){
-                System.out.println("8 - Show Departments info");
-                System.out.println("This is the list of Departments in " + Collage + ":");
-                ShowItemsInArray(Departments);
+                System.out.println("average salary of all lecturers");
+                System.out.println(Tools.getWageAve(c.getLecturers(),c.getNumOfLecturers()));
+
+            }
+            else if (userChoose == 9){
+                System.out.println("choose department number for avg");
+                System.out.println(Tools.showDepartmentsByIndex(c.getDepartments(),c.getNumOfDepartments()));
+                int numOfDep = s.nextInt();
+                if (numOfDep < 0 || numOfDep >= c.getNumOfDepartments()) {
+                    System.out.println("invalid department number!");
+                } else {
+                    System.out.println(c.getDepartments()[numOfDep].getWageAve());
+                }
+
+            }
+            else if (userChoose == 10){
+                System.out.println(c.getLecturersInfo());
+
+            }
+            else if (userChoose == 11){
+                System.out.println(c.getCommitteesInfo());
+
             }
             else{
                 System.out.println("invalide value!!! ");

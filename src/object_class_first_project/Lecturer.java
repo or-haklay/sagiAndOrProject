@@ -1,6 +1,6 @@
 package object_class_first_project;
 
-public class Lecturers {
+public class Lecturer {
     public enum eDegree{first_degree,masters,phd}
     private String name;
 
@@ -11,15 +11,21 @@ public class Lecturers {
     private int numOfCommittees;
 
 
-    public  Lecturers(String name, eDegree degree){
+    public Lecturer(String name, eDegree degree,int salary){
         this.name = name;
         this.theDegree = degree;
-        this.salary = 0;
+        this.salary = salary;
         this.theCommittees = new Committee[5];
         this.numOfCommittees = 0;
     }
 
+public Committee[] getCommittee(){
+        return theCommittees;
+}
 
+public int getNumOfCommittees(){
+        return numOfCommittees;
+}
 public boolean setName(String name){
     if(name.length()>=2){
         this.name=name;
@@ -74,12 +80,9 @@ public boolean addCommittee(Committee committee){
     }
 
     if(numOfCommittees >= theCommittees.length){
-        Committee[] oldCommittees = theCommittees;
-        theCommittees =  new Committee[numOfCommittees*2];
-        for(int i=0;i<oldCommittees.length;i++){
-            theCommittees[i] = oldCommittees[i];
-        }
+        Tools.doubleCommittees(theCommittees,numOfCommittees);
     }
+
     theCommittees[numOfCommittees] = committee;
     numOfCommittees++;
 
@@ -89,15 +92,30 @@ public boolean addCommittee(Committee committee){
 public boolean removeCommittee(Committee committee){
     for(int i =0 ; i < numOfCommittees ; i++){
         if(theCommittees[i] ==  committee){
-            committee.removeLecturer(this);
             for(int j=i+1;j<numOfCommittees;j++){
                 theCommittees[j-1]=theCommittees[j];
             }
             theCommittees[numOfCommittees-1]=null;
             numOfCommittees--;
+            committee.removeLecturer(this);
             return true;
         }
     }
     return false;
 }
+
+    public String toString() {
+
+        StringBuffer str = new StringBuffer("name: " + name + " | education: " + theDegree + " | salary is: " + salary);
+        if (theDepartment != null) {
+            str.append(" department: ").append(theDepartment.getName());
+        }
+        for (int i = 0; i < numOfCommittees; i++) {
+            str.append(" committee: ").append(theCommittees[i].getName());
+        }
+        return str.toString();
+    }
+
+
+
 }

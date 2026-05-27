@@ -2,14 +2,17 @@ package object_class_first_project;
 
 public class Committee {
     private String name;
-    private Lecturers[] lecturers;
+    private Lecturer[] lecturers;
     private int numOfLecturers;
-    private Lecturers ceo;
+    private Lecturer ceo;
 
-    public Committee(String name) {
+    //Add Ceo
+    public Committee(String name, Lecturer ceo) {
         this.name = name;
-        lecturers =  new Lecturers[5];
+        lecturers =  new Lecturer[5];
         numOfLecturers = 0;
+        setCeo(ceo);
+
     }
 
     public String getName() {
@@ -20,52 +23,51 @@ public class Committee {
         this.name = name;
     }
 
-    public Lecturers[] getLecturers() {
+    public Lecturer[] getLecturers() {
         return lecturers;
     }
 
-    public Lecturers getCeo() {
+    public Lecturer getCeo() {
         return ceo;
     }
 
-    public boolean addLecturer(Lecturers lecturer){
+    public boolean addLecturer(Lecturer lecturer){
         if(lecturer == null){
             return false;
         }
         if(numOfLecturers >= lecturers.length){
-            Lecturers[] oldLecturers = lecturers;
-            lecturers =  new Lecturers[numOfLecturers*2];
-            for(int i=0;i<oldLecturers.length;i++){
-                lecturers[i] = oldLecturers[i];
-            }
+            Tools.doubleLecturers(lecturers,numOfLecturers);
         }
         lecturers[numOfLecturers] = lecturer;
         numOfLecturers++;
         return true;
     }
 
-    public boolean removeLecturer(Lecturers lecturer){
+    public boolean removeLecturer(Lecturer lecturer){
         if(lecturer == null){
             return false;
         }
 
         for(int i=0;i<numOfLecturers;i++){
             if(lecturers[i] == lecturer){
-                lecturer.removeCommittee(this);
                 for(int j=i+1;j<numOfLecturers;j++){
                     lecturers[j-1] = lecturers[j];
                 }
                 lecturers[numOfLecturers-1] = null;
                 numOfLecturers--;
+                lecturer.removeCommittee(this);
                 return  true;
             }
         }
         return  false;
     }
 
-    public boolean setCeo(Lecturers ceo) {
-        Lecturers oldCeo = this.ceo;
+    public boolean setCeo(Lecturer ceo) {
+        Lecturer oldCeo = this.ceo;
         if(ceo == oldCeo || ceo == null){
+            return false;
+        }
+        if  (ceo.getDegree() != Lecturer.eDegree.phd){
             return false;
         }
         for(int i =0 ; i< numOfLecturers;i++){
@@ -84,6 +86,22 @@ public class Committee {
         this.ceo = ceo;
 
         return true;
+    }
+
+    public int getWageAve(){
+        return Tools.getWageAve(lecturers , numOfLecturers);
+    }
+
+    public String toString(){
+        StringBuffer res = new StringBuffer();
+        res.append("Name: " + this.name);
+        res.append("\nCEO: " + this.ceo);
+        res.append("\n Lecturers: [");
+        for(int i=0;i<numOfLecturers;i++){
+            res.append(lecturers[i].getName() + " , ");
+        }
+        res.append("\b\b ]");
+        return res.toString();
     }
 
 
