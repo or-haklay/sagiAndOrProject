@@ -62,6 +62,8 @@ public class Tools {
 
 
 
+    ///show index
+    //delete
     public static String showDepartmentsByIndex(Department[] d ,int depLen){
         int cnt=0;
         String  s="";
@@ -108,6 +110,9 @@ public class Tools {
          }
          return sum/numOfLecturers;
      }
+
+
+     ///get functions
 
      public static Lecturer getLecturer(String lecturerName,Lecturer[] lec){
          for(int i=0;i<lec.length ;i++){

@@ -2,7 +2,8 @@ package object_class_first_project;
 import java.util.Scanner;
 
 public class Main {
-
+    // Sagi Gilad - 324020825
+    // Or Haklay - 322307687
     public static void main(String[] args){
         // Sagi Gilad - 324020825
         // Or Haklay - 322307687
@@ -29,7 +30,7 @@ public class Main {
             System.out.println("6 - Add Department To Collage");
             System.out.println("7 - Add Lecturer to Department");
             System.out.println("8 - Show average of Lecturers  wage");
-            System.out.println("9 - Show average of Lecturers  wage of specific Committee");
+            System.out.println("9 - Show average of Lecturers  wage of specific Department");
             System.out.println("10 - Show Lucturers info");
             System.out.println("11 - Show Committees info");
             System.out.println("------------");
@@ -42,16 +43,28 @@ public class Main {
                 break;
             }
             else if (userChoose == 1 ){
-                System.out.println("enter lecturer name: ");
-                s.nextLine();
-                String lecturerName = s.nextLine();
+                String lecturerName = "";
+                boolean validName = false;
                 Lecturer.eDegree selectedDegree = null;
+
+                s.nextLine(); // consume leftover newline from nextInt()
+                while (!validName) {
+                    System.out.println("enter lecturer name: ");
+                    String input = s.nextLine();
+                    if (!input.isEmpty() && !Tools.findLecturInArray(input, c.getLecturers(), c.getNumOfLecturers())){
+                        lecturerName = input;
+                        validName = true;
+                    }
+                    else{
+                        System.out.println("invalid input!");
+                    }
+                }
+
                 while (selectedDegree == null) {
                     System.out.println("choose lecturer degree from list (first_degree, masters, phd):");
                     String input = s.next();
                     if (input.equals("first_degree") || input.equals("masters") || input.equals("phd") ){
                         selectedDegree = Lecturer.eDegree.valueOf(input);
-
                     }
                     else{
                         System.out.println("invalid input!");
@@ -70,9 +83,14 @@ public class Main {
 
             else if (userChoose == 2 ) {
 
+                if(c.getNumOfLecturers() < 1){
+                    System.out.println("You have to add at least one lecturer!");
+                    continue;
+                }
+
                 boolean validComm = false;
                 String CommitteesName;
-                s.nextLine(); // consume leftover newline from nextInt()
+                s.nextLine();
                 do {
                     System.out.println("Enter committee name: ");
                     CommitteesName = s.nextLine();
@@ -111,6 +129,12 @@ public class Main {
             }
 
             else if (userChoose == 3 ){
+
+                if(c.getNumOfCommittees() < 1){
+                    System.out.println("You have to add at least one Committee!");
+                    continue;
+                }
+
                 boolean validComm=false;
                 boolean validLecturer=false;
                 String committeeName;
@@ -146,16 +170,21 @@ public class Main {
 
             }
             else if (userChoose == 4 ){
+                if(c.getNumOfCommittees() < 1){
+                    System.out.println("You have to add at least one Committee!");
+                    continue;
+                }
                 boolean validComm=false;
                 boolean validLecturer=false;
-                String committeeName;
-                String lucturerName;
+                Committee com = null;
+                Lecturer l = null;
 
-                s.nextLine(); // consume leftover newline from nextInt()
+                s.nextLine();
                 do {
                     System.out.println("Enter committee name: ");
-                    committeeName = s.nextLine();
+                    String committeeName = s.nextLine();
                     if(Tools.findCommitteeInArray(committeeName,c.getCommittees(),c.getNumOfCommittees())){
+                        com = c.getCommitteeByName(committeeName);
                         validComm=true;
                     }
                     else{
@@ -165,8 +194,9 @@ public class Main {
 
                 do {
                     System.out.println("Enter lucturer name: ");
-                    lucturerName = s.nextLine();
+                    String lucturerName = s.nextLine();
                     if(Tools.findLecturInArray(lucturerName,c.getLecturers(),c.getNumOfLecturers())){
+                        l = c.getLecturerByName(lucturerName);
                         validLecturer=true;
                     }
                     else{
@@ -174,35 +204,59 @@ public class Main {
                     }
                 }while(!validLecturer);
 
-                boolean isDone = c.setCeo(Tools.getCommittee(committeeName, c.getCommittees()), Tools.getLecturer(lucturerName, c.getLecturers()));
+                boolean isDone = c.setCeo(com,l);
+
                 if(isDone){
-                    System.out.println("committee is added successfully!");
+                    System.out.println("CEO updated successfully!");
                 }else {
-                    System.out.println("invalid committee name! try again!");
+                    System.out.println("failed to update CEO!");
                 }
 
             }
             else if (userChoose == 5 ){
-                System.out.println("choose lecturer number");
 
-                System.out.println(Tools.showLecturerByIndex(c.getLecturers(),c.getNumOfLecturers()));
-                int LectureIndex = s.nextInt();
-                Lecturer toRemove= c.getLecturers()[LectureIndex];
-                System.out.println("choose the committee to remove lecturer from");
-                System.out.println(Tools.showCommiteesByIndex(toRemove.getCommittee(),toRemove.getNumOfCommittees()));
-                int commetiiChoose = s.nextInt();
-                Committee cTemp=toRemove.getCommittee()[commetiiChoose];
+                boolean validComm=false;
+                boolean validLecturer=false;
+                Committee com = null;
+                Lecturer l = null;
 
-                c.removeLecturerFromCommittee(toRemove, cTemp);
+                s.nextLine();
+                do {
+                    System.out.println("Enter committee name: ");
+                    String committeeName = s.nextLine();
+                    if(Tools.findCommitteeInArray(committeeName,c.getCommittees(),c.getNumOfCommittees())){
+                        com = c.getCommitteeByName(committeeName);
+                        validComm=true;
+                    }
+                    else{
+                        System.out.println("invalid committee name! try again!");
+                    }
+                }while(!validComm);
 
+                do {
+                    System.out.println("Enter lucturer name: ");
+                    String lucturerName = s.nextLine();
+                    if(Tools.findLecturInArray(lucturerName,com.getLecturers(),com.getNumOfLecturers())){
+                        l = c.getLecturerByName(lucturerName);
+                        validLecturer=true;
+                    }
+                    else{
+                        System.out.println("invalid lucturer name! try again!");
+                    }
+                }while(!validLecturer);
 
+                boolean isDone = c.removeLecturerFromCommittee(com,l);
 
-
+                if(isDone){
+                    System.out.println("lecturer removed from committee successfully!");
+                }else {
+                    System.out.println("failed to remove lecturer from committee!");
+                }
 
             }
             else if (userChoose == 6){
                 s.nextLine();
-                System.out.print("Enter commit tee name: ");
+                System.out.print("Enter department name: ");
                 String departmentName = s.nextLine();
                 System.out.println("Enter number of students: ");
                 int numOfStudents = s.nextInt();

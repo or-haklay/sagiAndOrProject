@@ -11,8 +11,8 @@ public class Committee {
         this.name = name;
         lecturers =  new Lecturer[5];
         numOfLecturers = 0;
-        setCeo(ceo);
-
+        this.ceo = ceo;
+        if(ceo != null) ceo.addCommittee(this);
     }
 
     public String getName() {
@@ -27,6 +27,10 @@ public class Committee {
         return lecturers;
     }
 
+    public int getNumOfLecturers() {
+        return numOfLecturers;
+    }
+
     public Lecturer getCeo() {
         return ceo;
     }
@@ -36,10 +40,11 @@ public class Committee {
             return false;
         }
         if(numOfLecturers >= lecturers.length){
-            Tools.doubleLecturers(lecturers,numOfLecturers);
+            lecturers = Tools.doubleLecturers(lecturers,numOfLecturers);
         }
         lecturers[numOfLecturers] = lecturer;
         numOfLecturers++;
+        lecturer.addCommittee(this);
         return true;
     }
 
@@ -63,28 +68,27 @@ public class Committee {
     }
 
     public boolean setCeo(Lecturer ceo) {
-        Lecturer oldCeo = this.ceo;
-        if(ceo == oldCeo || ceo == null){
+        if(ceo == null || ceo == this.ceo){
             return false;
         }
-        if  (ceo.getDegree() != Lecturer.eDegree.phd){
+        if(ceo.getDegree() != Lecturer.eDegree.phd){
             return false;
         }
-        for(int i =0 ; i< numOfLecturers;i++){
+        for(int i = 0; i < numOfLecturers; i++){
             if(ceo == lecturers[i]){
-                if(oldCeo != null){
-                    oldCeo.removeCommittee(this);
+                for(int j=i+1; j<numOfLecturers; j++){
+                    lecturers[j-1] = lecturers[j];
                 }
-                ceo.addCommittee(this);
-                for(int j=i+1;j<numOfLecturers;j++){
-                    lecturers[j-1]=lecturers[j];
-                }
-                lecturers[numOfLecturers-1]=null;
+                lecturers[numOfLecturers-1] = null;
                 numOfLecturers--;
+                break;
             }
         }
+        if(this.ceo != null){
+            this.ceo.removeCommittee(this);
+        }
+        ceo.addCommittee(this);
         this.ceo = ceo;
-
         return true;
     }
 

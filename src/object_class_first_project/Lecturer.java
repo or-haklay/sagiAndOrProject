@@ -106,13 +106,17 @@ public boolean removeCommittee(Committee committee){
 
     public String toString() {
 
-        StringBuffer str = new StringBuffer("name: " + name + " | education: " + theDegree + " | salary is: " + salary);
+        StringBuffer str = new StringBuffer("[ name: " + name + " | education: " + theDegree + " | salary is: " + salary);
         if (theDepartment != null) {
             str.append(" department: ").append(theDepartment.getName());
         }
+
+        if(numOfCommittees > 0){
+        str.append(" committees: ");
         for (int i = 0; i < numOfCommittees; i++) {
-            str.append(" committee: ").append(theCommittees[i].getName());
+            str.append(theCommittees[i].getName() + " ,");
         }
+        str.append("\n\n ]");}
         return str.toString();
     }
 

@@ -46,28 +46,20 @@ public class Collage {
 
     public int getNumOfLecturers(){return numOfLecturers;}
 
-
-
-
-
-
     ///menu functions
     ///#1
     public boolean addLecturer(Lecturer lecturer){
         if(lecturer==null){
             return false;
         }
-
         for(int i=0; i<numOfLecturers; i++){
             if(lecturers[i]==lecturer){
                 return false;
             }
         }
-
         if(numOfLecturers >= lecturers.length){
             lecturers = Tools.doubleLecturers(lecturers , numOfLecturers);
         }
-
         lecturers[numOfLecturers] = lecturer;
         numOfLecturers++;
         return true;
@@ -78,13 +70,11 @@ public class Collage {
         if(committee==null){
             return false;
         }
-
         for(int i=0; i<numOfCommittees; i++){
             if(committees[i]==committee){
                 return false;
             }
         }
-
         if(numOfCommittees >= committees.length){
             committees = Tools.doubleCommittees(committees , numOfCommittees);
         }
@@ -113,11 +103,9 @@ public class Collage {
     }
 
     ///#5
-    public boolean removeLecturerFromCommittee(Lecturer l,Committee c){
-      if( !( Tools.findLecturInArray(l.getName(),c.getLecturers(), c.getLecturers().length)))
-            {return false;}
-      c.removeLecturer(l);
-      l.removeCommittee(c);
+    public boolean removeLecturerFromCommittee(Committee com ,Lecturer l){
+      if( !( Tools.findLecturInArray(l.getName(),com.getLecturers() ,com.getNumOfLecturers()))){return false;}
+      com.removeLecturer(l);
       return true;
     }
 
@@ -126,22 +114,18 @@ public class Collage {
         if(department==null){
             return false;
         }
-
         for(int i=0; i<numOfDepartments; i++){
             if(departments[i]==department){
                 return false;
             }
         }
-
         if(numOfDepartments >= departments.length){
             departments = Tools.doubleDepartments(departments , numOfDepartments);
         }
-
         departments[numOfDepartments] = department;
         numOfDepartments++;
         return true;
     }
-
 
     ///#7
     public boolean addLecturerToDepartment(Department department, Lecturer lecturer){
@@ -168,11 +152,9 @@ public class Collage {
         res.append("Lecturers: \n");
         res.append("-----------");
         for (int i = 0; i < numOfLecturers; i++) {
-            res.append("\n-----------");
             res.append("\n" + lecturers[i].toString());
         }
         return res.toString();
-
     }
 
     ///#11
@@ -184,8 +166,35 @@ public class Collage {
             res.append("\n-----------");
             res.append("\nName: " + committees[i].getName() + " | CEO: " +  committees[i].getCeo().getName());
         }
-
         return res.toString();
+    }
+
+    ///get by name
+    public Lecturer getLecturerByName(String lecturerName){
+        for(int i=0; i<numOfLecturers; i++){
+            if(lecturers[i].getName().equals(lecturerName)){
+                return lecturers[i];
+            }
+        }
+        return null;
+    }
+
+    public Committee getCommitteeByName(String committeeName){
+        for(int i=0; i<numOfCommittees; i++){
+            if(committees[i].getName().equals(committeeName)){
+                return committees[i];
+            }
+        }
+        return null;
+    }
+
+    public Department getDepartmentByName(String departmentName){
+        for(int i=0; i<numOfDepartments; i++){
+            if(departments[i].getName().equals(departmentName)){
+                return departments[i];
+            }
+        }
+        return null;
     }
 
 
