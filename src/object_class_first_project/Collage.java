@@ -135,7 +135,7 @@ public class Collage {
     }
 
     public String getLecturersInfo() {
-        StringBuilder res = new StringBuilder("Lecturers: \n-----------");
+        StringBuffer res = new StringBuffer("Lecturers: \n-----------");
         for (int i = 0; i < numOfLecturers; i++) {
             res.append("\n").append(lecturers[i].toString());
         }
@@ -143,7 +143,7 @@ public class Collage {
     }
 
     public String getCommitteesInfo() {
-        StringBuilder res = new StringBuilder("Committees: \n-----------");
+        StringBuffer res = new StringBuffer("Committees: \n-----------");
         for (int i = 0; i < numOfCommittees; i++) {
             res.append("\n-----------");
             res.append("\nName: ").append(committees[i].getName())

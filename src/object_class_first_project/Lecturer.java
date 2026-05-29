@@ -84,7 +84,7 @@ public class Lecturer {
     }
 
     public String toString() {
-        StringBuilder str = new StringBuilder("[ name: " + name + " | education: " + theDegree + " | salary: " + salary);
+        StringBuffer str = new StringBuffer("[ name: " + name + " | education: " + theDegree + " | salary: " + salary);
         if (theDepartment != null) {
             str.append(" | department: ").append(theDepartment.getName());
         }

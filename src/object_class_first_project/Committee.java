@@ -96,7 +96,7 @@ public class Committee {
     }
 
     public String toString() {
-        StringBuilder res = new StringBuilder("Name: " + name + " | CEO: " + (ceo != null ? ceo.getName() : "none"));
+        StringBuffer res = new StringBuffer("Name: " + name + " | CEO: " + (ceo != null ? ceo.getName() : "none"));
         if (numOfLecturers > 0) {
             res.append(" | Members: ");
             for (int i = 0; i < numOfLecturers; i++) {
