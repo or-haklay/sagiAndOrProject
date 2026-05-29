@@ -1,4 +1,4 @@
-package object_class_first_project;
+package sagiAndOr;
 
 public class Committee {
     private String name;
@@ -66,11 +66,15 @@ public class Committee {
         return false;
     }
 
+    private boolean isEligibleCeo(Lecturer lecturer) {
+        return lecturer.getDegree() == Lecturer.eDegree.phd || lecturer.getDegree() == Lecturer.eDegree.professor;
+    }
+
     public boolean setCeo(Lecturer ceo) {
         if (ceo == null || ceo == this.ceo) {
             return false;
         }
-        if (ceo.getDegree() != Lecturer.eDegree.phd) {
+        if (!isEligibleCeo(ceo)) {
             return false;
         }
         for (int i = 0; i < numOfLecturers; i++) {

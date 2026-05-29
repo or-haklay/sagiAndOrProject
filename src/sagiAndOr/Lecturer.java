@@ -1,18 +1,22 @@
-package object_class_first_project;
+package sagiAndOr;
 
 public class Lecturer {
-    public enum eDegree { first_degree, masters, phd }
+    public enum eDegree { first_degree, masters, phd, professor }
 
     private String name;
+    private String id;
     private eDegree theDegree;
+    private String degreeName;
     private int salary;
     private Department theDepartment;
     private Committee[] theCommittees;
     private int numOfCommittees;
 
-    public Lecturer(String name, eDegree degree, int salary) {
+    public Lecturer(String name, String id, eDegree degree, String degreeName, int salary) {
         this.name = name;
+        this.id = id;
         this.theDegree = degree;
+        this.degreeName = degreeName;
         this.salary = salary;
         this.theCommittees = new Committee[5];
         this.numOfCommittees = 0;
@@ -30,8 +34,16 @@ public class Lecturer {
         return false;
     }
 
+    public String getId() {
+        return id;
+    }
+
     public eDegree getDegree() {
         return theDegree;
+    }
+
+    public String getDegreeName() {
+        return degreeName;
     }
 
     public int getSalary() {
@@ -84,7 +96,7 @@ public class Lecturer {
     }
 
     public String toString() {
-        StringBuffer str = new StringBuffer("[ name: " + name + " | education: " + theDegree + " | salary: " + salary);
+        StringBuffer str = new StringBuffer("[ name: " + name + " | id: " + id + " | education: " + theDegree + " | degree name: " + degreeName + " | salary: " + salary);
         if (theDepartment != null) {
             str.append(" | department: ").append(theDepartment.getName());
         }

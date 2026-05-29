@@ -1,7 +1,11 @@
-package object_class_first_project;
+// Sagi Gilad - 324020825
+// Or Haklay - 322307687
+package sagiAndOr;
 import java.util.Scanner;
 
 public class Main {
+    // Sagi Gilad - 324020825
+    // Or Haklay - 322307687
     public static void main(String[] args) {
         Scanner s = new Scanner(System.in);
 
@@ -53,20 +57,27 @@ public class Main {
                     }
                 }
 
+                System.out.println("enter lecturer ID: ");
+                String lecturerId = s.nextLine();
+
                 while (selectedDegree == null) {
-                    System.out.println("choose lecturer degree from list (first_degree, masters, phd):");
+                    System.out.println("choose lecturer degree from list (first_degree, masters, phd, professor):");
                     String input = s.next();
-                    if (input.equals("first_degree") || input.equals("masters") || input.equals("phd")) {
+                    if (input.equals("first_degree") || input.equals("masters") || input.equals("phd") || input.equals("professor")) {
                         selectedDegree = Lecturer.eDegree.valueOf(input);
                     } else {
                         System.out.println("invalid input!");
                     }
                 }
 
+                s.nextLine();
+                System.out.println("enter degree name: ");
+                String degreeName = s.nextLine();
+
                 System.out.println("Enter Salary: ");
                 int salary = s.nextInt();
 
-                Lecturer l1 = new Lecturer(lecturerName, selectedDegree, salary);
+                Lecturer l1 = new Lecturer(lecturerName, lecturerId, selectedDegree, degreeName, salary);
                 c.addLecturer(l1);
                 System.out.println(l1.toString());
 
@@ -94,10 +105,10 @@ public class Main {
                     String ceoName = s.nextLine();
                     if (Tools.findLecturInArray(ceoName, c.getLecturers(), c.getNumOfLecturers())) {
                         l = Tools.getLecturer(ceoName, c.getLecturers());
-                        if (l.getDegree() == Lecturer.eDegree.phd) {
+                        if (l.getDegree() == Lecturer.eDegree.phd || l.getDegree() == Lecturer.eDegree.professor) {
                             validCeo = true;
                         } else {
-                            System.out.println("invalid lecturer degree! try again!");
+                            System.out.println("invalid lecturer degree! must be phd or professor. try again!");
                         }
                     } else {
                         System.out.println("invalid lecturer name! try again!");
@@ -214,8 +225,16 @@ public class Main {
 
             } else if (userChoose == 6) {
                 s.nextLine();
-                System.out.print("Enter department name: ");
-                String departmentName = s.nextLine();
+                String departmentName;
+                do {
+                    System.out.print("Enter department name: ");
+                    departmentName = s.nextLine();
+                    if (!Tools.findDepartmentInArray(departmentName, c.getDepartments(), c.getNumOfDepartments())) {
+                        break;
+                    }
+                    System.out.println("department already exists!");
+                } while (true);
+
                 System.out.println("Enter number of students: ");
                 int numOfStudents = s.nextInt();
                 Department d1 = new Department(numOfStudents, departmentName);

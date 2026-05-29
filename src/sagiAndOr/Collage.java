@@ -1,4 +1,4 @@
-package object_class_first_project;
+package sagiAndOr;
 
 public class Collage {
     private String collageName;
