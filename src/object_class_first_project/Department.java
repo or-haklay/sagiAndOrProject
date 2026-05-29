@@ -3,15 +3,15 @@ package object_class_first_project;
 public class Department {
     private String name;
     private int numOfStudents;
-    private int numOfLecturers=0;
+    private int numOfLecturers = 0;
     private Lecturer[] lecturers = new Lecturer[10];
 
-    public Department (int numOfStudents , String  name, Lecturer firstFecturer) {
+    public Department(int numOfStudents, String name, Lecturer firstLecturer) {
         this(numOfStudents, name);
-        addLecturer(firstFecturer);
+        addLecturer(firstLecturer);
     }
 
-    public Department (int numOfStudents , String  name){
+    public Department(int numOfStudents, String name) {
         this.numOfStudents = numOfStudents;
         this.name = name;
     }
@@ -28,30 +28,36 @@ public class Department {
         return lecturers;
     }
 
-    public boolean addLecturer(Lecturer theLecturer){
-        if(theLecturer == null){
+    public int getNumOfLecturers() {
+        return numOfLecturers;
+    }
+
+    public boolean addLecturer(Lecturer theLecturer) {
+        if (theLecturer == null) {
             return false;
         }
-
-        if(numOfLecturers >= lecturers.length){
-            Tools.doubleLecturers(lecturers, numOfLecturers);
+        for (int i = 0; i < numOfLecturers; i++) {
+            if (lecturers[i] == theLecturer) {
+                return false;
+            }
         }
-
+        if (numOfLecturers >= lecturers.length) {
+            lecturers = Tools.doubleLecturers(lecturers, numOfLecturers);
+        }
         lecturers[numOfLecturers] = theLecturer;
         theLecturer.setDepartment(this);
         numOfLecturers++;
-
         return true;
     }
 
-    public boolean removeLecturer(Lecturer theLecturer){
-        for(int i=0;i<numOfLecturers;i++){
-            if(theLecturer==lecturers[i]){
+    public boolean removeLecturer(Lecturer theLecturer) {
+        for (int i = 0; i < numOfLecturers; i++) {
+            if (theLecturer == lecturers[i]) {
                 theLecturer.setDepartment(null);
-                for(int j=i+1;j<numOfLecturers;j++){
-                    lecturers[j-1]=lecturers[j];
+                for (int j = i + 1; j < numOfLecturers; j++) {
+                    lecturers[j - 1] = lecturers[j];
                 }
-                lecturers[numOfLecturers-1]=null;
+                lecturers[numOfLecturers - 1] = null;
                 numOfLecturers--;
                 return true;
             }
@@ -59,9 +65,7 @@ public class Department {
         return false;
     }
 
-    public int getWageAve(){
-        return Tools.getWageAve(lecturers , numOfLecturers);
+    public int getWageAve() {
+        return Tools.getWageAve(lecturers, numOfLecturers);
     }
-
-
 }

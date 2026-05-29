@@ -2,134 +2,108 @@ package object_class_first_project;
 
 public class Tools {
 
-    /// double arrays functions
-    public static Department[] doubleDepartments(Department[] theArray, int leangth){
-        Department[] oldDepartment = theArray;
-        theArray =  new Department[leangth*2];
-        for(int i=0;i<oldDepartment.length;i++){
-            theArray[i] = oldDepartment[i];
+    public static Department[] doubleDepartments(Department[] theArray, int length) {
+        Department[] oldArray = theArray;
+        theArray = new Department[length * 2];
+        for (int i = 0; i < oldArray.length; i++) {
+            theArray[i] = oldArray[i];
         }
         return theArray;
     }
 
-    public static Committee[] doubleCommittees(Committee[] theArray,int leangth ){
-        Committee[] oldCommittees = theArray;
-        theArray =  new Committee[leangth*2];
-        for(int i=0;i<oldCommittees.length;i++){
-            theArray[i] = oldCommittees[i];
+    public static Committee[] doubleCommittees(Committee[] theArray, int length) {
+        Committee[] oldArray = theArray;
+        theArray = new Committee[length * 2];
+        for (int i = 0; i < oldArray.length; i++) {
+            theArray[i] = oldArray[i];
         }
         return theArray;
-
     }
 
-    public static Lecturer[] doubleLecturers(Lecturer[] theArray,int leangth ){
-        Lecturer[] oldLecturers = theArray;
-        theArray =  new Lecturer[leangth*2];
-        for(int i=0;i<oldLecturers.length;i++){
-            theArray[i] = oldLecturers[i];
+    public static Lecturer[] doubleLecturers(Lecturer[] theArray, int length) {
+        Lecturer[] oldArray = theArray;
+        theArray = new Lecturer[length * 2];
+        for (int i = 0; i < oldArray.length; i++) {
+            theArray[i] = oldArray[i];
         }
         return theArray;
-
     }
 
-    /// finds functions
-   public static boolean findLecturInArray(String name, Lecturer[] arr, int length)   {
-       for (int i=0; i<length; i++){
-           if (arr[i] != null && (arr[i].getName()).equals(name)){
-               return true;
-           }
-       }
-       return false;
-   }
-
-    public static boolean findDepartmentInArray(String name, Department[] arr, int length)   {
-        for (int i=0; i<length; i++){
-            if (arr[i] != null && (arr[i].getName()).equals(name)){
+    public static boolean findLecturInArray(String name, Lecturer[] arr, int length) {
+        for (int i = 0; i < length; i++) {
+            if (arr[i] != null && arr[i].getName().equals(name)) {
                 return true;
             }
         }
         return false;
     }
 
-    public static boolean findCommitteeInArray(String name, Committee[] arr, int length)   {
-        for (int i=0; i<length; i++){
-            if (arr[i] != null && (arr[i].getName()).equals(name)){
+    public static boolean findDepartmentInArray(String name, Department[] arr, int length) {
+        for (int i = 0; i < length; i++) {
+            if (arr[i] != null && arr[i].getName().equals(name)) {
                 return true;
             }
         }
         return false;
     }
 
+    public static boolean findCommitteeInArray(String name, Committee[] arr, int length) {
+        for (int i = 0; i < length; i++) {
+            if (arr[i] != null && arr[i].getName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-
-    ///show index
-    //delete
-    public static String showDepartmentsByIndex(Department[] d ,int depLen){
-        int cnt=0;
-        String  s="";
-        for(int i=0;i<depLen;i++){
-            s+=cnt+" "+d[i].getName()+"\n";
-            cnt++;
-
+    public static String showDepartmentsByIndex(Department[] d, int length) {
+        String s = "";
+        for (int i = 0; i < length; i++) {
+            s += i + " " + d[i].getName() + "\n";
         }
         return s;
     }
 
-    public static String showCommiteesByIndex(Committee[] c ,int CommLen){
-        int cnt=0;
-        String  s="";
-        for(int i=0;i<CommLen;i++){
-            s+=cnt+" "+c[i].getName()+"\n";
-            cnt++;
-
+    public static String showCommiteesByIndex(Committee[] c, int length) {
+        String s = "";
+        for (int i = 0; i < length; i++) {
+            s += i + " " + c[i].getName() + "\n";
         }
         return s;
     }
 
-    public static String showLecturerByIndex(Lecturer[] l ,int LecturLen){
-        int cnt=0;
-        String  s="";
-        for(int i=0;i<LecturLen;i++){
-            s+=cnt+" "+l[i].getName()+"\n";
-            cnt++;
-
+    public static String showLecturerByIndex(Lecturer[] l, int length) {
+        String s = "";
+        for (int i = 0; i < length; i++) {
+            s += i + " " + l[i].getName() + "\n";
         }
         return s;
     }
 
+    public static int getWageAve(Lecturer[] lecturers, int numOfLecturers) {
+        if (numOfLecturers == 0) return 0;
+        int sum = 0;
+        for (int i = 0; i < numOfLecturers; i++) {
+            sum += lecturers[i].getSalary();
+        }
+        return sum / numOfLecturers;
+    }
 
-
-
-
-     ///Wage functions
-     public static int getWageAve(Lecturer[] lecturers , int numOfLecturers){
-         if (numOfLecturers == 0) return 0;
-         int sum = 0;
-         for(int i=0; i<numOfLecturers; i++){
-             sum += lecturers[i].getSalary();
-         }
-         return sum/numOfLecturers;
-     }
-
-
-     ///get functions
-
-     public static Lecturer getLecturer(String lecturerName,Lecturer[] lec){
-         for(int i=0;i<lec.length ;i++){
-                if(lec[i] != null && lec[i].getName().equals(lecturerName)){
-                    return lec[i];
-                }
-         }
-         return null;
-     }
-
-    public static Committee getCommittee(String committeeName,Committee[] lec){
-        for(int i=0;i<lec.length ;i++){
-            if(lec[i] != null && lec[i].getName().equals(committeeName)){
+    public static Lecturer getLecturer(String lecturerName, Lecturer[] lec) {
+        for (int i = 0; i < lec.length; i++) {
+            if (lec[i] != null && lec[i].getName().equals(lecturerName)) {
                 return lec[i];
             }
         }
         return null;
     }
 
+    public static Committee getCommittee(String committeeName, Committee[] com) {
+        for (int i = 0; i < com.length; i++) {
+            if (com[i] != null && com[i].getName().equals(committeeName)) {
+                return com[i];
+            }
+        }
+        return null;
+    }
 }
