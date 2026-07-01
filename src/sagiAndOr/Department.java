@@ -68,4 +68,24 @@ public class Department {
     public int getWageAve() {
         return Tools.getWageAve(lecturers, numOfLecturers);
     }
+
+    @Override
+    public String toString() {
+        StringBuffer str = new StringBuffer("depatment name: "+name+" num of student is"
+        +numOfStudents +" lecturs: ");
+        for (int i = 0; i < numOfLecturers; i++) {
+            str.append(lecturers[i].getName()+" ");
+        }
+
+        return str.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Department))
+            return false;
+        Department d = (Department)obj;
+        return d.getName().equals(this.getName()) &&
+                d.getNumOfStudents()==this.getNumOfStudents();
+    }
 }

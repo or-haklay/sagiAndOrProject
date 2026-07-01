@@ -70,12 +70,12 @@ public class Committee {
         return lecturer.getDegree() == Lecturer.eDegree.phd || lecturer.getDegree() == Lecturer.eDegree.professor;
     }
 
-    public boolean setCeo(Lecturer ceo) {
+    public void setCeo(Lecturer ceo) throws NotEligibleCeoException, CollegeException {
         if (ceo == null || ceo == this.ceo) {
-            return false;
+            throw new CollegeException("cannot set, the ceo is already been sign");
         }
         if (!isEligibleCeo(ceo)) {
-            return false;
+           throw new NotEligibleCeoException(ceo.getName());
         }
         for (int i = 0; i < numOfLecturers; i++) {
             if (ceo == lecturers[i]) {
@@ -92,13 +92,13 @@ public class Committee {
         }
         ceo.addCommittee(this);
         this.ceo = ceo;
-        return true;
+
     }
 
     public int getWageAve() {
         return Tools.getWageAve(lecturers, numOfLecturers);
     }
-
+@Override
     public String toString() {
         StringBuffer res = new StringBuffer("Name: " + name + " | CEO: " + (ceo != null ? ceo.getName() : "none"));
         if (numOfLecturers > 0) {
@@ -110,4 +110,5 @@ public class Committee {
         }
         return res.toString();
     }
+
 }

@@ -87,11 +87,11 @@ public class Collage {
         return committee.addLecturer(lecturer);
     }
 
-    public boolean setCeo(Committee c, Lecturer ceo) {
+    public void setCeo(Committee c, Lecturer ceo) throws NotEligibleCeoException, CollegeException {
         if (!Tools.findCommitteeInArray(c.getName(), committees, numOfCommittees)) {
-            return false;
+            throw new CollegeException("committee not found!");
         }
-        return c.setCeo(ceo);
+        c.setCeo(ceo);
     }
 
     public boolean removeLecturerFromCommittee(Committee com, Lecturer l) {
@@ -178,4 +178,33 @@ public class Collage {
         }
         return null;
     }
+
+    public Articelable[] getAricleableLecturers() {
+        int count = 0;
+        for (int i = 0; i < numOfLecturers; i++) {
+            if (lecturers[i] instanceof Articelable) {
+                count++;
+            }
+        }
+        Articelable[] res = new Articelable[count];
+        int idx = 0;
+        for (int i = 0; i < numOfLecturers; i++) {
+            if (lecturers[i] instanceof Articelable) {
+                res[idx++] = (Articelable) lecturers[i];
+            }
+        }
+        return res;
+    }
+@Override
+    public String toString() {
+    StringBuffer str = new StringBuffer("collage name is:  " + collageName);
+    str.append("the committees are");
+    for (int i = 0; i < numOfCommittees; i++) {
+        str.append(committees[i].getName());
+    }
+    return str.toString();
+
+}
+
+
 }

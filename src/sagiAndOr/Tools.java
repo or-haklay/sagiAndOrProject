@@ -1,7 +1,15 @@
 package sagiAndOr;
 
 public class Tools {
+    public static String[] doubleNumOfArticals(String[] NumOfArticels, int length){
+        String[] OldArrayarticals=NumOfArticels;
+        String[] newArticalArray = new String[2*length];
+        for (int i = 0; i < OldArrayarticals.length; i++) {
+            newArticalArray[i] = OldArrayarticals[i];
+        }
+        return newArticalArray;
 
+    }
     public static Department[] doubleDepartments(Department[] theArray, int length) {
         Department[] oldArray = theArray;
         theArray = new Department[length * 2];
@@ -106,4 +114,5 @@ public class Tools {
         }
         return null;
     }
+
 }
