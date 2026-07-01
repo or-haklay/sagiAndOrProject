@@ -3,8 +3,14 @@ package sagiAndOr;
 public class Doctor extends Lecturer implements Articelable,Comparable<Articelable>{
     private String[] articles;
     private int numOfArticles;
+
     public Doctor(String name, String id,String degreeName, int salary) {
-        super(name, id, eDegree.phd, degreeName, salary);
+        this(name, id, eDegree.phd, degreeName, salary);
+    }
+
+    // lets subclasses (Prof) set their own degree while reusing the articles logic
+    protected Doctor(String name, String id, eDegree degree, String degreeName, int salary) {
+        super(name, id, degree, degreeName, salary);
         this.numOfArticles = 0;
         this.articles = new String[5];
     }
@@ -47,7 +53,7 @@ public class Doctor extends Lecturer implements Articelable,Comparable<Articelab
 
     @Override
     public String toString() {
-       return super.toString()+" num of atricles "+ numOfArticles;
+       return super.toString()+" num of articles "+ numOfArticles;
     }
 
     @Override

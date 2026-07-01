@@ -45,13 +45,13 @@ public class Collage {
         return numOfLecturers;
     }
 
-    public boolean addLecturer(Lecturer lecturer) {
+    public void addLecturer(Lecturer lecturer) throws CollegeException {
         if (lecturer == null) {
-            return false;
+            throw new CollegeException("lecturer cannot be null");
         }
         for (int i = 0; i < numOfLecturers; i++) {
             if (lecturers[i] == lecturer) {
-                return false;
+                throw new CollegeException(lecturer.getName() + " already exists in the collage");
             }
         }
         if (numOfLecturers >= lecturers.length) {
@@ -59,16 +59,15 @@ public class Collage {
         }
         lecturers[numOfLecturers] = lecturer;
         numOfLecturers++;
-        return true;
     }
 
-    public boolean addCommittee(Committee committee) {
+    public void addCommittee(Committee committee) throws CollegeException {
         if (committee == null) {
-            return false;
+            throw new CollegeException("committee cannot be null");
         }
         for (int i = 0; i < numOfCommittees; i++) {
             if (committees[i] == committee) {
-                return false;
+                throw new CollegeException(committee.getName() + " already exists in the collage");
             }
         }
         if (numOfCommittees >= committees.length) {
@@ -76,15 +75,14 @@ public class Collage {
         }
         committees[numOfCommittees] = committee;
         numOfCommittees++;
-        return true;
     }
 
-    public boolean addLecturerToCommittee(Lecturer lecturer, Committee committee) {
+    public void addLecturerToCommittee(Lecturer lecturer, Committee committee) throws AlreadyMemberException, CollegeException {
         if (!Tools.findLecturInArray(lecturer.getName(), lecturers, numOfLecturers) ||
                 !Tools.findCommitteeInArray(committee.getName(), committees, numOfCommittees)) {
-            return false;
+            throw new CollegeException("lecturer or committee not found in the collage");
         }
-        return committee.addLecturer(lecturer);
+        committee.addLecturer(lecturer);
     }
 
     public void setCeo(Committee c, Lecturer ceo) throws NotEligibleCeoException, CollegeException {
@@ -94,20 +92,20 @@ public class Collage {
         c.setCeo(ceo);
     }
 
-    public boolean removeLecturerFromCommittee(Committee com, Lecturer l) {
+    public void removeLecturerFromCommittee(Committee com, Lecturer l) throws CollegeException {
         if (!Tools.findLecturInArray(l.getName(), com.getLecturers(), com.getNumOfLecturers())) {
-            return false;
+            throw new CollegeException(l.getName() + " is not a member of this committee");
         }
-        return com.removeLecturer(l);
+        com.removeLecturer(l);
     }
 
-    public boolean addDepartment(Department department) {
+    public void addDepartment(Department department) throws CollegeException {
         if (department == null) {
-            return false;
+            throw new CollegeException("department cannot be null");
         }
         for (int i = 0; i < numOfDepartments; i++) {
             if (departments[i] == department) {
-                return false;
+                throw new CollegeException(department.getName() + " already exists in the collage");
             }
         }
         if (numOfDepartments >= departments.length) {
@@ -115,15 +113,14 @@ public class Collage {
         }
         departments[numOfDepartments] = department;
         numOfDepartments++;
-        return true;
     }
 
-    public boolean addLecturerToDepartment(Department department, Lecturer lecturer) {
+    public void addLecturerToDepartment(Department department, Lecturer lecturer) throws CollegeException {
         if (!Tools.findLecturInArray(lecturer.getName(), lecturers, numOfLecturers) ||
                 !Tools.findDepartmentInArray(department.getName(), departments, numOfDepartments)) {
-            return false;
+            throw new CollegeException("lecturer or department not found in the collage");
         }
-        return department.addLecturer(lecturer);
+        department.addLecturer(lecturer);
     }
 
     public int getWageAve() {
@@ -206,5 +203,12 @@ public class Collage {
 
 }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Collage))
+            return false;
+        Collage other = (Collage) obj;
+        return other.getCollageName().equals(this.collageName);
+    }
 
 }

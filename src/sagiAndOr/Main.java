@@ -1,5 +1,7 @@
 // Sagi Gilad - 324020825
 // Or Haklay - 322307687
+
+
 package sagiAndOr;
 import java.util.Scanner;
 
@@ -17,7 +19,7 @@ public class Main {
             System.out.println("------------");
             System.out.println("Welcome to " + c.getCollageName());
             System.out.println("This is the menu to your collage admin system");
-            System.out.println("choose one of the next options (0-11):");
+            System.out.println("choose one of the next options (0-16):");
             System.out.println("------------");
             System.out.println("0 - Exit");
             System.out.println("1 - Add Lecturer To Collage");
@@ -31,6 +33,11 @@ public class Main {
             System.out.println("9 - Show average of Lecturers wage of specific Department");
             System.out.println("10 - Show Lecturers info");
             System.out.println("11 - Show Committees info");
+            System.out.println("12 - Compare Doctors/Professors by number of articles");
+            System.out.println("13 - Compare Committees by number of members");
+            System.out.println("14 - Compare Committees by number of articles");
+            System.out.println("15 - Duplicate Committee");
+            System.out.println("16 - Add Article to Lecturer");
             System.out.println("------------");
             System.out.println("Enter your choice: ");
 
@@ -40,7 +47,7 @@ public class Main {
             switch (userChoose) {
                 case 0:
                     System.out.println("goodbye");
-                    break;
+                    return;
 
                 case 1: {
 
@@ -80,9 +87,25 @@ public class Main {
                     System.out.println("Enter Salary: ");
                     int salary = s.nextInt();
 
-                    Lecturer l1 = new Lecturer(lecturerName, lecturerId, selectedDegree, degreeName, salary);
-                    c.addLecturer(l1);
-                    System.out.println(l1.toString());
+                    Lecturer newLec;
+                    if (selectedDegree == Lecturer.eDegree.phd) {
+                        newLec = new Doctor(lecturerName, lecturerId, degreeName, salary);
+                    } else if (selectedDegree == Lecturer.eDegree.professor) {
+                        Prof p = new Prof(lecturerName, lecturerId, degreeName, salary);
+                        s.nextLine();
+                        System.out.println("enter the body that granted the professorship: ");
+                        p.setDiplomGiver(s.nextLine());
+                        newLec = p;
+                    } else {
+                        newLec = new Lecturer(lecturerName, lecturerId, selectedDegree, degreeName, salary);
+                    }
+
+                    try {
+                        c.addLecturer(newLec);
+                        System.out.println(newLec.toString());
+                    } catch (CollegeException e) {
+                        System.out.println(e.getMessage());
+                    }
                     break;
                 }
 
@@ -103,6 +126,18 @@ public class Main {
                         System.out.println("committee already exists!");
                     } while (true);
 
+                    boolean hasEligibleCeo = false;
+                    for (int i = 0; i < c.getNumOfLecturers(); i++) {
+                        if (c.getLecturers()[i] instanceof Doctor || c.getLecturers()[i] instanceof Prof) {
+                            hasEligibleCeo = true;
+                            break;
+                        }
+                    }
+                    if (!hasEligibleCeo) {
+                        System.out.println("no eligible CEO (Dr. or Prof.) exists! add one first.");
+                        continue;
+                    }
+
                     boolean validCeo = false;
                     Lecturer l = null;
                     do {
@@ -110,7 +145,7 @@ public class Main {
                         String ceoName = s.nextLine();
                         if (Tools.findLecturInArray(ceoName, c.getLecturers(), c.getNumOfLecturers())) {
                             l = Tools.getLecturer(ceoName, c.getLecturers());
-                            if (l.getDegree() == Lecturer.eDegree.phd || l.getDegree() == Lecturer.eDegree.professor) {
+                            if (l instanceof Doctor || l instanceof Prof) {
                                 validCeo = true;
                             } else {
                                 System.out.println("invalid lecturer degree! must be phd or professor. try again!");
@@ -120,9 +155,12 @@ public class Main {
                         }
                     } while (!validCeo);
 
-                    Committee com = new Committee(committeeName, l);
-                    if (c.addCommittee(com)) {
+                    try {
+                        Committee com = new Committee(committeeName, l);
+                        c.addCommittee(com);
                         System.out.println("committee added successfully!");
+                    } catch (CollegeException e) {
+                        System.out.println(e.getMessage());
                     }
                     break;
                 }
@@ -155,8 +193,15 @@ public class Main {
                         System.out.println("invalid lecturer name! try again!");
                     } while (true);
 
-                    c.addLecturerToCommittee(Tools.getLecturer(lecturerName, c.getLecturers()),
-                            Tools.getCommittee(committeeName, c.getCommittees()));
+                    try {
+                        c.addLecturerToCommittee(Tools.getLecturer(lecturerName, c.getLecturers()),
+                                Tools.getCommittee(committeeName, c.getCommittees()));
+                        System.out.println("lecturer added to committee successfully!");
+                    } catch (AlreadyMemberException e) {
+                        System.out.println(e.getMessage());
+                    } catch (CollegeException e) {
+                        System.out.println(e.getMessage());
+                    }
                     break;
                 }
 
@@ -193,8 +238,8 @@ public class Main {
                     try {
                         c.setCeo(com, l);
                         System.out.println("CEO updated successfully!");
-                    } catch (Exception e) {
-                        System.out.println("failed to update CEO!");
+                    } catch (CollegeException e) {
+                        System.out.println(e.getMessage());
                     }
                     break;
                 }
@@ -219,6 +264,11 @@ public class Main {
                         System.out.println("invalid committee name! try again!");
                     } while (true);
 
+                    if (com.getNumOfLecturers() < 1) {
+                        System.out.println("this committee has no members to remove!");
+                        continue;
+                    }
+
                     do {
                         System.out.println("Enter lecturer name: ");
                         String lecturerName = s.nextLine();
@@ -229,10 +279,11 @@ public class Main {
                         System.out.println("invalid lecturer name! try again!");
                     } while (true);
 
-                    if (c.removeLecturerFromCommittee(com, l)) {
+                    try {
+                        c.removeLecturerFromCommittee(com, l);
                         System.out.println("lecturer removed from committee successfully!");
-                    } else {
-                        System.out.println("failed to remove lecturer from committee!");
+                    } catch (CollegeException e) {
+                        System.out.println(e.getMessage());
                     }
                     break;
                 }
@@ -252,12 +303,16 @@ public class Main {
                     System.out.println("Enter number of students: ");
                     int numOfStudents = s.nextInt();
                     Department d1 = new Department(numOfStudents, departmentName);
-                    c.addDepartment(d1);
-                    System.out.println("Name: " + d1.getName() + " | Number of students: " + d1.getNumOfStudents());
+                    try {
+                        c.addDepartment(d1);
+                        System.out.println("Name: " + d1.getName() + " | Number of students: " + d1.getNumOfStudents());
+                    } catch (CollegeException e) {
+                        System.out.println(e.getMessage());
+                    }
                     break;
                 }
 
-                case 7:
+                case 7: {
                     if (c.getNumOfLecturers() < 1 || c.getNumOfDepartments() < 1) {
                         System.out.println("You need at least one lecturer and one department!");
                         continue;
@@ -265,19 +320,29 @@ public class Main {
                     System.out.println("choose lecturer number");
                     System.out.println(Tools.showLecturerByIndex(c.getLecturers(), c.getNumOfLecturers()));
                     int lecIndex = s.nextInt();
+                    if (lecIndex < 0 || lecIndex >= c.getNumOfLecturers()) {
+                        System.out.println("invalid lecturer number!");
+                        continue;
+                    }
                     Lecturer lecToAdd = c.getLecturers()[lecIndex];
 
                     System.out.println("choose department number");
                     System.out.println(Tools.showDepartmentsByIndex(c.getDepartments(), c.getNumOfDepartments()));
                     int depIndex = s.nextInt();
+                    if (depIndex < 0 || depIndex >= c.getNumOfDepartments()) {
+                        System.out.println("invalid department number!");
+                        continue;
+                    }
                     Department depToAdd = c.getDepartments()[depIndex];
 
-                    if (c.addLecturerToDepartment(depToAdd, lecToAdd)) {
+                    try {
+                        c.addLecturerToDepartment(depToAdd, lecToAdd);
                         System.out.println("lecturer added to department successfully!");
-                    } else {
-                        System.out.println("failed to add lecturer to department!");
+                    } catch (CollegeException e) {
+                        System.out.println(e.getMessage());
                     }
                     break;
+                }
 
                 case 8:
                     System.out.println("average salary of all lecturers: " + c.getWageAve());
@@ -306,8 +371,8 @@ public class Main {
                     System.out.println(c.getCommitteesInfo());
                     break;
 
-                case 12:
-                    //dr-prop comper
+                case 12: {
+                    // compare Doctors/Professors by number of articles (descending)
                     Articelable[] arr = c.getAricleableLecturers();
                     for (int i = 0; i < arr.length - 1; i++) {
                         for (int j = 0; j < arr.length - 1 - i; j++) {
@@ -319,21 +384,119 @@ public class Main {
                         }
                     }
                     for (int i = 0; i < arr.length; i++) {
-                        if(arr[i]!= null){
-                            System.out.println(i+". " + arr[i].getName());
-                        }
+                        System.out.println(i + ". " + arr[i].getName() + " - articles: " + arr[i].getNumOfArticles());
                     }
                     break;
+                }
 
+                case 13: {
+                    // compare committees by number of members
+                    if (c.getNumOfCommittees() < 2) {
+                        System.out.println("You need at least two committees!");
+                        continue;
+                    }
+                    System.out.println(Tools.showCommiteesByIndex(c.getCommittees(), c.getNumOfCommittees()));
+                    System.out.println("choose first committee number:");
+                    int i1 = s.nextInt();
+                    System.out.println("choose second committee number:");
+                    int i2 = s.nextInt();
+                    if (i1 < 0 || i1 >= c.getNumOfCommittees() || i2 < 0 || i2 >= c.getNumOfCommittees()) {
+                        System.out.println("invalid committee number!");
+                        continue;
+                    }
+                    Committee a = c.getCommittees()[i1];
+                    Committee b = c.getCommittees()[i2];
+                    int r = new CommitteeByMembersComparator().compare(a, b);
+                    if (r > 0) {
+                        System.out.println(a.getName() + " has more members");
+                    } else if (r < 0) {
+                        System.out.println(b.getName() + " has more members");
+                    } else {
+                        System.out.println("both committees have the same number of members");
+                    }
+                    break;
+                }
 
-                case 13:
-                    //committee compares by num of members
+                case 14: {
+                    // compare committees by number of articles
+                    if (c.getNumOfCommittees() < 2) {
+                        System.out.println("You need at least two committees!");
+                        continue;
+                    }
+                    System.out.println(Tools.showCommiteesByIndex(c.getCommittees(), c.getNumOfCommittees()));
+                    System.out.println("choose first committee number:");
+                    int i1 = s.nextInt();
+                    System.out.println("choose second committee number:");
+                    int i2 = s.nextInt();
+                    if (i1 < 0 || i1 >= c.getNumOfCommittees() || i2 < 0 || i2 >= c.getNumOfCommittees()) {
+                        System.out.println("invalid committee number!");
+                        continue;
+                    }
+                    Committee a = c.getCommittees()[i1];
+                    Committee b = c.getCommittees()[i2];
+                    int r = new CommitteeByArticlesComparator().compare(a, b);
+                    if (r > 0) {
+                        System.out.println(a.getName() + " has more articles");
+                    } else if (r < 0) {
+                        System.out.println(b.getName() + " has more articles");
+                    } else {
+                        System.out.println("both committees have the same number of articles");
+                    }
+                    break;
+                }
 
-                case 14:
-                    //committee compares by num of articles
+                case 15: {
+                    // duplicate committee
+                    if (c.getNumOfCommittees() < 1) {
+                        System.out.println("You have to add at least one Committee!");
+                        continue;
+                    }
+                    System.out.println(Tools.showCommiteesByIndex(c.getCommittees(), c.getNumOfCommittees()));
+                    System.out.println("choose committee number to duplicate:");
+                    int idx = s.nextInt();
+                    if (idx < 0 || idx >= c.getNumOfCommittees()) {
+                        System.out.println("invalid committee number!");
+                        continue;
+                    }
+                    try {
+                        Committee copy = c.getCommittees()[idx].duplicate();
+                        c.addCommittee(copy);
+                        System.out.println("committee duplicated: " + copy.getName());
+                    } catch (CollegeException e) {
+                        System.out.println(e.getMessage());
+                    }
+                    break;
+                }
 
-                case 15:
-                    //copy committe
+                case 16: {
+                    // add article to a Doctor/Professor
+                    if (c.getNumOfLecturers() < 1) {
+                        System.out.println("You have to add at least one lecturer!");
+                        continue;
+                    }
+                    System.out.println(Tools.showLecturerByIndex(c.getLecturers(), c.getNumOfLecturers()));
+                    System.out.println("choose lecturer number:");
+                    int idx = s.nextInt();
+                    if (idx < 0 || idx >= c.getNumOfLecturers()) {
+                        System.out.println("invalid lecturer number!");
+                        continue;
+                    }
+                    Lecturer lec = c.getLecturers()[idx];
+                    if (!(lec instanceof Articelable)) {
+                        System.out.println("only Dr. or Prof. can have articles!");
+                        continue;
+                    }
+                    s.nextLine();
+                    System.out.println("enter article name:");
+                    String articleName = s.nextLine();
+                    try {
+                        ((Articelable) lec).addArticel(articleName);
+                        System.out.println("article added successfully!");
+                    } catch (CollegeException e) {
+                        System.out.println(e.getMessage());
+                    }
+                    break;
+                }
 
                 default:
                     System.out.println("invalid value!");

@@ -66,10 +66,11 @@ public class Lecturer {
         return numOfCommittees;
     }
 
-    public boolean addCommittee(Committee committee) {
+    // internal bidirectional sync - does not call back into Committee to avoid mutual recursion
+    public void addCommittee(Committee committee) throws CollegeException {
         for (int i = 0; i < numOfCommittees; i++) {
             if (theCommittees[i] == committee) {
-                return false;
+                throw new CollegeException(name + " is already assigned to this committee");
             }
         }
         if (numOfCommittees >= theCommittees.length) {
@@ -77,10 +78,10 @@ public class Lecturer {
         }
         theCommittees[numOfCommittees] = committee;
         numOfCommittees++;
-        return true;
     }
 
-    public boolean removeCommittee(Committee committee) {
+    // internal bidirectional sync - does not call back into Committee to avoid mutual recursion
+    public void removeCommittee(Committee committee) throws CollegeException {
         for (int i = 0; i < numOfCommittees; i++) {
             if (theCommittees[i] == committee) {
                 for (int j = i + 1; j < numOfCommittees; j++) {
@@ -88,11 +89,10 @@ public class Lecturer {
                 }
                 theCommittees[numOfCommittees - 1] = null;
                 numOfCommittees--;
-                committee.removeLecturer(this);
-                return true;
+                return;
             }
         }
-        return false;
+        throw new CollegeException(name + " is not assigned to this committee");
     }
 
     public String toString() {
@@ -109,5 +109,13 @@ public class Lecturer {
         }
         str.append(" ]");
         return str.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Lecturer))
+            return false;
+        Lecturer l = (Lecturer) obj;
+        return l.getName().equals(this.name) && l.getId().equals(this.id);
     }
 }

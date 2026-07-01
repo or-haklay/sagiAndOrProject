@@ -6,7 +6,7 @@ public class Department {
     private int numOfLecturers = 0;
     private Lecturer[] lecturers = new Lecturer[10];
 
-    public Department(int numOfStudents, String name, Lecturer firstLecturer) {
+    public Department(int numOfStudents, String name, Lecturer firstLecturer) throws CollegeException {
         this(numOfStudents, name);
         addLecturer(firstLecturer);
     }
@@ -32,13 +32,13 @@ public class Department {
         return numOfLecturers;
     }
 
-    public boolean addLecturer(Lecturer theLecturer) {
+    public void addLecturer(Lecturer theLecturer) throws CollegeException {
         if (theLecturer == null) {
-            return false;
+            throw new CollegeException("lecturer cannot be null");
         }
         for (int i = 0; i < numOfLecturers; i++) {
             if (lecturers[i] == theLecturer) {
-                return false;
+                throw new CollegeException(theLecturer.getName() + " is already in this department");
             }
         }
         if (numOfLecturers >= lecturers.length) {
@@ -47,10 +47,9 @@ public class Department {
         lecturers[numOfLecturers] = theLecturer;
         theLecturer.setDepartment(this);
         numOfLecturers++;
-        return true;
     }
 
-    public boolean removeLecturer(Lecturer theLecturer) {
+    public void removeLecturer(Lecturer theLecturer) throws CollegeException {
         for (int i = 0; i < numOfLecturers; i++) {
             if (theLecturer == lecturers[i]) {
                 theLecturer.setDepartment(null);
@@ -59,10 +58,10 @@ public class Department {
                 }
                 lecturers[numOfLecturers - 1] = null;
                 numOfLecturers--;
-                return true;
+                return;
             }
         }
-        return false;
+        throw new CollegeException(theLecturer.getName() + " is not in this department");
     }
 
     public int getWageAve() {

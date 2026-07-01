@@ -6,7 +6,7 @@ public class Committee {
     private int numOfLecturers;
     private Lecturer ceo;
 
-    public Committee(String name, Lecturer ceo) {
+    public Committee(String name, Lecturer ceo) throws CollegeException {
         this.name = name;
         this.lecturers = new Lecturer[5];
         this.numOfLecturers = 0;
@@ -30,13 +30,13 @@ public class Committee {
         return ceo;
     }
 
-    public boolean addLecturer(Lecturer lecturer) {
+    public void addLecturer(Lecturer lecturer) throws AlreadyMemberException, CollegeException {
         if (lecturer == null) {
-            return false;
+            throw new CollegeException("lecturer cannot be null");
         }
         for (int i = 0; i < numOfLecturers; i++) {
             if (lecturers[i] == lecturer) {
-                return false;
+                throw new AlreadyMemberException(lecturer.getName());
             }
         }
         if (numOfLecturers >= lecturers.length) {
@@ -45,12 +45,11 @@ public class Committee {
         lecturers[numOfLecturers] = lecturer;
         numOfLecturers++;
         lecturer.addCommittee(this);
-        return true;
     }
 
-    public boolean removeLecturer(Lecturer lecturer) {
+    public void removeLecturer(Lecturer lecturer) throws CollegeException {
         if (lecturer == null) {
-            return false;
+            throw new CollegeException("lecturer cannot be null");
         }
         for (int i = 0; i < numOfLecturers; i++) {
             if (lecturers[i] == lecturer) {
@@ -60,14 +59,14 @@ public class Committee {
                 lecturers[numOfLecturers - 1] = null;
                 numOfLecturers--;
                 lecturer.removeCommittee(this);
-                return true;
+                return;
             }
         }
-        return false;
+        throw new CollegeException(lecturer.getName() + " is not a member of this committee");
     }
 
     private boolean isEligibleCeo(Lecturer lecturer) {
-        return lecturer.getDegree() == Lecturer.eDegree.phd || lecturer.getDegree() == Lecturer.eDegree.professor;
+        return lecturer instanceof Doctor || lecturer instanceof Prof;
     }
 
     public void setCeo(Lecturer ceo) throws NotEligibleCeoException, CollegeException {
@@ -77,6 +76,7 @@ public class Committee {
         if (!isEligibleCeo(ceo)) {
            throw new NotEligibleCeoException(ceo.getName());
         }
+        boolean wasMember = false;
         for (int i = 0; i < numOfLecturers; i++) {
             if (ceo == lecturers[i]) {
                 for (int j = i + 1; j < numOfLecturers; j++) {
@@ -84,19 +84,44 @@ public class Committee {
                 }
                 lecturers[numOfLecturers - 1] = null;
                 numOfLecturers--;
+                wasMember = true;
                 break;
             }
         }
         if (this.ceo != null) {
             this.ceo.removeCommittee(this);
         }
-        ceo.addCommittee(this);
+        // if the new ceo was already a member it is still linked to this committee, so skip re-linking
+        if (!wasMember) {
+            ceo.addCommittee(this);
+        }
         this.ceo = ceo;
 
     }
 
     public int getWageAve() {
         return Tools.getWageAve(lecturers, numOfLecturers);
+    }
+
+    public int getTotalArticles() {
+        int sum = 0;
+        if (ceo instanceof Articelable) {
+            sum += ((Articelable) ceo).getNumOfArticles();
+        }
+        for (int i = 0; i < numOfLecturers; i++) {
+            if (lecturers[i] instanceof Articelable) {
+                sum += ((Articelable) lecturers[i]).getNumOfArticles();
+            }
+        }
+        return sum;
+    }
+
+    public Committee duplicate() throws AlreadyMemberException, CollegeException {
+        Committee copy = new Committee(name + "-new", ceo);
+        for (int i = 0; i < numOfLecturers; i++) {
+            copy.addLecturer(lecturers[i]);
+        }
+        return copy;
     }
 @Override
     public String toString() {
@@ -109,6 +134,14 @@ public class Committee {
             }
         }
         return res.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Committee))
+            return false;
+        Committee c = (Committee) obj;
+        return c.getName().equals(this.name);
     }
 
 }
