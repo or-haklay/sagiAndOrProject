@@ -1,16 +1,32 @@
 package sagiAndOr;
 
-public class Committee {
-    private String name;
-    private Lecturer[] lecturers;
-    private int numOfLecturers;
-    private Lecturer ceo;
+import java.util.ArrayList;
 
-    public Committee(String name, Lecturer ceo) throws CollegeException {
+public class Committee<T extends Lecturer> implements java.io.Serializable {
+    private String name;
+    private ArrayList<T> lecturers;
+    private Lecturer ceo;
+    private eCommitteeType type;
+
+    public enum eCommitteeType {regular, doctors, professors;}
+
+    public boolean matches(Lecturer l) {
+        switch (this.type) {
+            case eCommitteeType.professors: return l instanceof Prof;
+            case eCommitteeType.doctors:    return (l instanceof Doctor) && !(l instanceof Prof);
+            case eCommitteeType.regular:    return !(l instanceof Doctor);
+        }
+        return false;
+    }
+
+
+
+
+    public Committee(String name, Lecturer ceo, eCommitteeType type) throws CollegeException {
         this.name = name;
-        this.lecturers = new Lecturer[5];
-        this.numOfLecturers = 0;
+        this.lecturers = new ArrayList<T>();
         this.ceo = ceo;
+        this.type = type;
         if (ceo != null) ceo.addCommittee(this);
     }
 
@@ -18,12 +34,12 @@ public class Committee {
         return name;
     }
 
-    public Lecturer[] getLecturers() {
+    public ArrayList<T> getLecturers() {
         return lecturers;
     }
 
-    public int getNumOfLecturers() {
-        return numOfLecturers;
+    public eCommitteeType getType() {
+        return type;
     }
 
     public Lecturer getCeo() {
@@ -34,16 +50,14 @@ public class Committee {
         if (lecturer == null) {
             throw new CollegeException("lecturer cannot be null");
         }
-        for (int i = 0; i < numOfLecturers; i++) {
-            if (lecturers[i] == lecturer) {
-                throw new AlreadyMemberException(lecturer.getName());
-            }
+        if (lecturers.contains(lecturer)) {
+            throw new AlreadyMemberException(lecturer.getName());
         }
-        if (numOfLecturers >= lecturers.length) {
-            lecturers = Tools.doubleLecturers(lecturers, numOfLecturers);
+        if (!matches(lecturer)) {
+            throw new CollegeException(lecturer.getName() + " does not match this committee's degree type (" + type + ")");
         }
-        lecturers[numOfLecturers] = lecturer;
-        numOfLecturers++;
+
+        lecturers.add((T) lecturer);
         lecturer.addCommittee(this);
     }
 
@@ -51,22 +65,22 @@ public class Committee {
         if (lecturer == null) {
             throw new CollegeException("lecturer cannot be null");
         }
-        for (int i = 0; i < numOfLecturers; i++) {
-            if (lecturers[i] == lecturer) {
-                for (int j = i + 1; j < numOfLecturers; j++) {
-                    lecturers[j - 1] = lecturers[j];
-                }
-                lecturers[numOfLecturers - 1] = null;
-                numOfLecturers--;
-                lecturer.removeCommittee(this);
-                return;
-            }
+
+        if (lecturers.contains(lecturer)) {
+            lecturers.remove(lecturer);
+            lecturer.removeCommittee(this);
+            return;
         }
+
         throw new CollegeException(lecturer.getName() + " is not a member of this committee");
     }
 
+    public int getNumOfLecturers() {
+        return lecturers.size();
+    }
+
     private boolean isEligibleCeo(Lecturer lecturer) {
-        return lecturer instanceof Doctor || lecturer instanceof Prof;
+        return lecturer instanceof Doctor;
     }
 
     public void setCeo(Lecturer ceo) throws NotEligibleCeoException, CollegeException {
@@ -76,61 +90,51 @@ public class Committee {
         if (!isEligibleCeo(ceo)) {
            throw new NotEligibleCeoException(ceo.getName());
         }
-        boolean wasMember = false;
-        for (int i = 0; i < numOfLecturers; i++) {
-            if (ceo == lecturers[i]) {
-                for (int j = i + 1; j < numOfLecturers; j++) {
-                    lecturers[j - 1] = lecturers[j];
-                }
-                lecturers[numOfLecturers - 1] = null;
-                numOfLecturers--;
-                wasMember = true;
-                break;
-            }
-        }
-        if (this.ceo != null) {
-            this.ceo.removeCommittee(this);
-        }
-        // if the new ceo was already a member it is still linked to this committee, so skip re-linking
-        if (!wasMember) {
+
+        if(lecturers.contains(ceo)) {
+            lecturers.remove(ceo);
+        }else{
             ceo.addCommittee(this);
         }
-        this.ceo = ceo;
 
+        this.ceo = ceo;
     }
 
     public int getWageAve() {
-        return Tools.getWageAve(lecturers, numOfLecturers);
+        return Tools.getWageAve(lecturers);
     }
+
 
     public int getTotalArticles() {
         int sum = 0;
         if (ceo instanceof Articelable) {
             sum += ((Articelable) ceo).getNumOfArticles();
         }
-        for (int i = 0; i < numOfLecturers; i++) {
-            if (lecturers[i] instanceof Articelable) {
-                sum += ((Articelable) lecturers[i]).getNumOfArticles();
+
+        for (Lecturer lecturer : lecturers) {
+            if(lecturer instanceof Articelable){
+                sum += ((Articelable) lecturer).getNumOfArticles();
             }
         }
+
         return sum;
     }
 
     public Committee duplicate() throws AlreadyMemberException, CollegeException {
-        Committee copy = new Committee(name + "-new", ceo);
-        for (int i = 0; i < numOfLecturers; i++) {
-            copy.addLecturer(lecturers[i]);
+        Committee copy = new Committee(name + "-new", ceo, type);
+        for(Lecturer lecturer : lecturers){
+            copy.addLecturer(lecturer);
         }
         return copy;
     }
 @Override
     public String toString() {
         StringBuffer res = new StringBuffer("Name: " + name + " | CEO: " + (ceo != null ? ceo.getName() : "none"));
-        if (numOfLecturers > 0) {
+        if (! lecturers.isEmpty()) {
             res.append(" | Members: ");
-            for (int i = 0; i < numOfLecturers; i++) {
-                res.append(lecturers[i].getName());
-                if (i < numOfLecturers - 1) res.append(", ");
+            for (int i=0; i<lecturers.size(); i++) {
+                res.append(lecturers.get(i).getName());
+                if(i<lecturers.size()-1) res.append(", ");
             }
         }
         return res.toString();
@@ -143,5 +147,6 @@ public class Committee {
         Committee c = (Committee) obj;
         return c.getName().equals(this.name);
     }
+
 
 }

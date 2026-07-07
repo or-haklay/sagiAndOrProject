@@ -1,8 +1,9 @@
 package sagiAndOr;
 
+import java.util.ArrayList;
+
 public class Doctor extends Lecturer implements Articelable,Comparable<Articelable>{
-    private String[] articles;
-    private int numOfArticles;
+    private ArrayList<String> articles;
 
     public Doctor(String name, String id,String degreeName, int salary) {
         this(name, id, eDegree.phd, degreeName, salary);
@@ -11,49 +12,36 @@ public class Doctor extends Lecturer implements Articelable,Comparable<Articelab
     // lets subclasses (Prof) set their own degree while reusing the articles logic
     protected Doctor(String name, String id, eDegree degree, String degreeName, int salary) {
         super(name, id, degree, degreeName, salary);
-        this.numOfArticles = 0;
-        this.articles = new String[5];
+        this.articles = new ArrayList<String>();
     }
 
     @Override
-    public void addArticel(String articelName) throws CollegeException{
-        if (articelName == null) {
+    public void addArticel(String articleName) throws CollegeException{
+        if (articleName == null) {
             throw new CollegeException("Article name cannot be null");
         }
-        for (int i = 0; i < numOfArticles; i++) {
-            if (articles[i].equals(articelName)) {
-                throw new CollegeException("Article already exists");
-            }
+        if(articles.contains(articleName)){
+            throw new CollegeException("Article already exists");
         }
-        if (numOfArticles >= articles.length) {
-            articles = Tools.doubleNumOfArticals(articles, numOfArticles);
-        }
-        articles[numOfArticles] = articelName;
-        numOfArticles++;
+        articles.add(articleName);
     }
 
     @Override
-    public void removeArticel(String articelName) throws CollegeException {
-        for (int i = 0; i < numOfArticles; i++) {
-            if (articles[i].equals(articelName)) {
-                for (int j = i + 1; j < numOfArticles; j++) {
-                    articles[j - 1] = articles[j];
-                }
-                articles[numOfArticles - 1] = null;
-                numOfArticles--;
-                return;
-            }
+    public void removeArticel(String articleName) throws CollegeException {
+        if(articles.contains(articleName)){
+            articles.remove(articleName);
+            return;
         }
         throw new CollegeException("article not in the list!");
     }
 
     public int getNumOfArticles() {
-        return numOfArticles;
+        return articles.size();
     }
 
     @Override
     public String toString() {
-       return super.toString()+" num of articles "+ numOfArticles;
+       return super.toString()+" num of articles "+ articles.size();
     }
 
     @Override

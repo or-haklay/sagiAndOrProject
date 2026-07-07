@@ -1,6 +1,7 @@
 package sagiAndOr;
+import java.util.ArrayList;
 
-public class Lecturer {
+public class Lecturer implements java.io.Serializable {
     public enum eDegree { first_degree, masters, phd, professor }
 
     private String name;
@@ -9,8 +10,7 @@ public class Lecturer {
     private String degreeName;
     private int salary;
     private Department theDepartment;
-    private Committee[] theCommittees;
-    private int numOfCommittees;
+    private ArrayList<Committee> committees;
 
     public Lecturer(String name, String id, eDegree degree, String degreeName, int salary) {
         this.name = name;
@@ -18,20 +18,11 @@ public class Lecturer {
         this.theDegree = degree;
         this.degreeName = degreeName;
         this.salary = salary;
-        this.theCommittees = new Committee[5];
-        this.numOfCommittees = 0;
+        this.committees = new ArrayList<Committee>();
     }
 
     public String getName() {
         return name;
-    }
-
-    public boolean setName(String name) {
-        if (name.length() >= 2) {
-            this.name = name;
-            return true;
-        }
-        return false;
     }
 
     public String getId() {
@@ -58,40 +49,28 @@ public class Lecturer {
         this.theDepartment = newDepartment;
     }
 
-    public Committee[] getCommittees() {
-        return theCommittees;
+    public ArrayList<Committee> getCommittees() {
+        return committees;
     }
 
     public int getNumOfCommittees() {
-        return numOfCommittees;
+        return committees.size();
     }
 
-    // internal bidirectional sync - does not call back into Committee to avoid mutual recursion
     public void addCommittee(Committee committee) throws CollegeException {
-        for (int i = 0; i < numOfCommittees; i++) {
-            if (theCommittees[i] == committee) {
-                throw new CollegeException(name + " is already assigned to this committee");
-            }
+        if (committees.contains(committee)) {
+            throw new CollegeException(name + " is already assigned to this committee");
         }
-        if (numOfCommittees >= theCommittees.length) {
-            theCommittees = Tools.doubleCommittees(theCommittees, numOfCommittees);
-        }
-        theCommittees[numOfCommittees] = committee;
-        numOfCommittees++;
+        committees.add(committee);
     }
 
-    // internal bidirectional sync - does not call back into Committee to avoid mutual recursion
     public void removeCommittee(Committee committee) throws CollegeException {
-        for (int i = 0; i < numOfCommittees; i++) {
-            if (theCommittees[i] == committee) {
-                for (int j = i + 1; j < numOfCommittees; j++) {
-                    theCommittees[j - 1] = theCommittees[j];
-                }
-                theCommittees[numOfCommittees - 1] = null;
-                numOfCommittees--;
-                return;
-            }
+
+        if(committees.contains(committee)) {
+            committees.remove(committee);
+            return;
         }
+
         throw new CollegeException(name + " is not assigned to this committee");
     }
 
@@ -100,12 +79,12 @@ public class Lecturer {
         if (theDepartment != null) {
             str.append(" | department: ").append(theDepartment.getName());
         }
-        if (numOfCommittees > 0) {
+        if (!committees.isEmpty()) {
             str.append(" | committees: ");
-            for (int i = 0; i < numOfCommittees; i++) {
-                str.append(theCommittees[i].getName());
-                if (i < numOfCommittees - 1) str.append(", ");
+            for(Committee c : committees) {
+                str.append(c.getName() + ", ");
             }
+            str.delete(str.length() - 2, str.length()-1);
         }
         str.append(" ]");
         return str.toString();
